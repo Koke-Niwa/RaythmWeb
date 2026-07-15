@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>raythm - trace the line before the beat disappears</title>
+    <style>
+        /* カラーパレットの設定 */
+        :root {
+            --bg-main: #121212;     /* メイン背景（黒） */
+            --bg-sub: #1e1e1e;      /* サブ背景（少し明るい黒） */
+            --text-main: #ffffff;   /* メインテキスト（白） */
+            --primary: #8A2BE2;     /* メインカラー（紫） */
+            --secondary: #00FFFF;   /* サブカラー（淡青） */
+            
+            /* ワイヤーフレーム指定のアクセントカラー */
+            --accent-green: #4CAF50;
+            --accent-lightgreen: #8BC34A;
+            --accent-yellow: #FFD700;
+            --accent-orange: #FF8C00;
+        }
+
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth; /* スムーススクロールを有効化 */
+            scroll-padding-top: 80px; /* ヘッダーが追従するため、スクロールの停止位置を調整 */
+        }
+        
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* ヘッダー（固定） */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            border-bottom: 2px solid var(--primary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            flex-wrap: wrap; /* スマホなどで折り返すため */
+            gap: 15px;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        /* ロゴマーク（点・線・点） */
+        .logo-mark {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .dot-purple { width: 5px; height: 12px; background-color: var(--primary); border-radius: 2.5px; }
+        .line-purple { width: 5px; height: 26px; background-color: var(--primary); border-radius: 2.5px; }
+        .dot-blue { width: 5px; height: 12px; background-color: var(--secondary); border-radius: 2.5px; }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        /* ナビゲーションメニュー */
+        .header-nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover {
+            color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .nav-line {
+            width: 4px;
+            height: 18px;
+            border-radius: 2px;
+        }
+        
+        .steam-btn {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--text-main);
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .steam-btn:hover {
+            background-color: var(--text-main);
+            color: var(--bg-main);
+        }
+
+        /* メインビジュアルエリア */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .catchphrase {
+            font-size: 24px;
+            margin-bottom: 40px;
+            color: var(--text-main);
+            text-shadow: 0 0 10px var(--primary);
+        }
+        .pv-container {
+            width: 100%;
+            max-width: 600px;
+            height: 337px;
+            background-color: var(--bg-sub);
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--primary);
+            color: #888;
+        }
+
+        /* 各セクション共通 */
+        .section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            padding-left: 15px;
+            border-left: 6px solid;
+        }
+        .section-subtitle {
+            font-size: 16px;
+            color: #ccc;
+            margin-bottom: 40px;
+            padding-left: 21px;
+        }
+        
+        /* 見出しの色指定 */
+        .title-green { border-color: var(--accent-green); }
+        .title-yellow { border-color: var(--accent-yellow); }
+        .title-orange { border-color: var(--accent-orange); }
+        .title-purple { border-color: var(--primary); }
+        .title-white { border-color: #ffffff; }
+
+        /* レイアウト用コンテナ（画像＋テキスト） */
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 30px;
+        }
+        .row.reverse {
+            flex-direction: row-reverse;
+        }
+        .text-box {
+            flex: 1;
+        }
+        .text-box h3 {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .text-box h3 span {
+            font-size: 20px;
+            color: var(--text-main);
+        }
+
+        /* 画像プレースホルダー */
+        .img-placeholder {
+            flex: 1;
+            aspect-ratio: 16 / 9;
+            background-color: var(--bg-sub);
+            border: 1px dashed var(--secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--secondary);
+            font-size: 14px;
+        }
+
+        /* 楽曲リスト */
+        .song-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        .song-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-sub);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+        .song-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .song-info {
+            flex-grow: 1;
+        }
+        .play-icon {
+            color: var(--primary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* ボタン類 */
+        .btn-center {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .action-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .action-btn:hover {
+            background-color: #7B1FA2;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Q&A (開閉式・アコーディオン) */
+        .qa-item {
+            background-color: var(--bg-sub);
+            margin-bottom: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: border-color 0.3s;
+        }
+        .qa-item[open] {
+            border-color: var(--primary);
+        }
+        
+        .question {
+            padding: 15px;
+            background-color: rgba(138, 43, 226, 0.1);
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+            padding-right: 50px;
+            user-select: none;
+        }
+        .question::-webkit-details-marker {
+            display: none;
+        }
+        .question::before {
+            content: "Q. ";
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        .question::after {
+            content: "▼";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--primary);
+            transition: transform 0.3s, color 0.3s;
+        }
+        .qa-item[open] .question {
+            background-color: rgba(138, 43, 226, 0.25);
+            border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+        }
+        .qa-item[open] .question::after {
+            transform: translateY(-50%) rotate(180deg);
+            color: var(--secondary);
+        }
+
+        .answer {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            line-height: 1.7;
+        }
+        .answer::before {
+            content: "A. ";
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* トップへ戻るボタン */
+        .top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--bg-sub);
+            color: var(--primary);
+            border: 2px dotted var(--primary);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1000;
+            transition: 0.3s;
+        }
+        .top-btn:hover {
+            box-shadow: 0 0 10px var(--primary);
+            color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        /* フッター */
+        footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 992px) {
+            header {
+                justify-content: center;
+            }
+            .header-nav {
+                justify-content: center;
+                gap: 15px;
+            }
+        }
+        @media (max-width: 768px) {
+            .row, .row.reverse {
+                flex-direction: column;
+            }
+            .img-placeholder {
+                width: 100%;
+            }
+            .text-box h3 {
+                font-size: 30px;
+            }
+        }
+    
+        /* メインビジュアルエリア（改修版） */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 80px 20px 100px;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--bg-main);
+        }
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(50px, 12vw, 130px);
+            letter-spacing: 10px;
+            margin-bottom: 0px;
+            color: var(--text-main);
+            text-transform: lowercase; /* 2枚目画像の「raythm」に合わせる */
+            z-index: 2;
+        }
+        .catchphrase {
+            font-family: "Courier New", Courier, monospace;
+            font-size: clamp(14px, 2vw, 22px);
+            margin-bottom: 40px;
+            color: #888;
+            letter-spacing: 2px;
+            z-index: 2;
+        }
+        .pv-container {
+            width: 100%;
+            max-width: 600px;
+            height: 337px;
+            background-color: var(--bg-sub);
+            margin: 0 auto 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--primary);
+            color: #888;
+            z-index: 2;
+        }
+        .steam-store-area {
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .steam-large-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            border: 3px solid var(--text-main);
+            padding: 12px 50px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 40px;
+            font-family: Arial, sans-serif;
+            font-style: italic;
+            font-weight: bold;
+            transition: 0.3s;
+            background-color: rgba(0, 0, 0, 0.6);
+            letter-spacing: 2px;
+        }
+        .steam-large-btn:hover {
+            background-color: var(--text-main);
+            color: var(--bg-main);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        .steam-icon {
+            width: 40px;
+            height: 40px;
+            fill: currentColor;
+        }
+        .store-subtext {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+
+        /* 画面下部のオーディオビジュアライザー（ブロック状） */
+        .hero-visualizer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            opacity: 0.7;
+            z-index: 1;
+        }
+        .hero-bar {
+            flex: 1;
+            max-width: 25px;
+            /* 6pxのブロック、2pxの隙間を繰り返す */
+            background-image: repeating-linear-gradient(to top, var(--primary) 0, var(--primary) 6px, transparent 6px, transparent 8px);
+        }
+</style>
+</head>
+<body id="top">
+
+    <!-- ヘッダー -->
+    <header>
+        <a href="#top" class="header-left">
+            <div class="logo-mark">
+                <span class="dot-purple"></span>
+                <span class="line-purple"></span>
+                <span class="dot-blue"></span>
+            </div>
+            <div class="logo">raythm</div>
+        </a>
+        
+        <nav class="header-nav">
+            <a href="#how-to-play" class="nav-item">
+                <span class="nav-line" style="background-color: var(--accent-green);"></span>遊び方
+            </a>
+            <a href="#mode" class="nav-item">
+                <span class="nav-line" style="background-color: var(--accent-lightgreen);"></span>モード
+            </a>
+            <a href="#ranking" class="nav-item">
+                <span class="nav-line" style="background-color: var(--accent-yellow);"></span>ランキング
+            </a>
+            <a href="#songs" class="nav-item">
+                <span class="nav-line" style="background-color: var(--accent-orange);"></span>楽曲・公募
+            </a>
+            <a href="#qa" class="nav-item">
+                <span class="nav-line" style="background-color: var(--primary);"></span>Q&A
+            </a>
+            <a href="#terms" class="nav-item">
+                <span class="nav-line" style="background-color: #ffffff;"></span>利用規約
+            </a>
+        </nav>
+
+        
+    </header>
+
+    
+    
+    <!-- メインビジュアル -->
+    <div class="hero">
+        <h1 class="main-title">raythm</h1>
+        <h2 class="catchphrase">trace the line before the beat disappears</h2>
+
+        <div class="steam-store-area" style="margin-bottom: 80px;">
+            <a href="#" class="steam-large-btn">
+                <svg class="steam-icon" viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M496 253.6c0 136.9-111.1 248.1-248.4 248.1-113.8 0-209.6-76.4-239-180.4l95.3 39.3c5 24.6 27.1 43.1 53.2 43.1 29.8 0 53.8-24.2 53.8-54 0-11.1-3.4-21.4-9.2-30.3l191.1-133.5c1.2 4.1 1.8 8.4 1.8 12.8 0 29.8-24.2 53.8-54 53.8-11.1 0-21.4-3.4-30.3-9.2L176.6 384c-4.1-1.2-8.4-1.8-12.8-1.8-29.8 0-53.8 24.2-53.8 54s24.2 54 54 54c29.8 0 53.8-24.2 53.8-54 0-4.4-.6-8.7-1.8-12.8l133.5-191.1c8.9 5.8 19.2 9.2 30.3 9.2 29.8 0 54-24.2 54-54s-24.2-54-54-54-54 24.2-54 54c0 4.4.6 8.7 1.8 12.8L136.3 334.6 20 286.3C28.4 130.6 156.4 5.9 312.4 5.9 449.6 5.9 496 117.1 496 253.6zm-336.5 138l-30.4-12.6c-5.4 12.9-1.6 27.6 11.2 34.4 13 6.9 28.9 1.9 35.8-11.1 6.9-13 1.9-28.9-11.1-35.8-5.3-2.8-11.1-3.6-16.7-2.6l30.4 12.6c13 5.4 19.1 20.3 13.8 33.3-5.4 13-20.3 19.1-33.3 13.8-12.9-5.4-19.1-20.3-13.8-33.3-5.4-12.9-20.3-19.1-33.3-13.8zM390 148.6c-20.8 0-37.7 16.9-37.7 37.7 0 20.8 16.9 37.7 37.7 37.7 20.8 0 37.7-16.9 37.7-37.7 0-20.8-16.9-37.7-37.7-37.7zm0 52.6c-8.2 0-14.9-6.7-14.9-14.9 0-8.2 6.7-14.9 14.9-14.9 8.2 0 14.9 6.7 14.9 14.9 0 8.2-6.7 14.9-14.9 14.9z"/>
+                </svg>
+                steam
+            </a>
+            <p class="store-subtext">ストアページはこちら</p>
+        </div>
+
+        <div class="hero-visualizer">
+            <div class="hero-bar" style="height: 8px;"></div>
+            <div class="hero-bar" style="height: 8px;"></div>
+            <div class="hero-bar" style="height: 16px;"></div>
+            <div class="hero-bar" style="height: 16px;"></div>
+            <div class="hero-bar" style="height: 24px;"></div>
+            <div class="hero-bar" style="height: 24px;"></div>
+            <div class="hero-bar" style="height: 24px;"></div>
+            <div class="hero-bar" style="height: 32px;"></div>
+            <div class="hero-bar" style="height: 32px;"></div>
+            <div class="hero-bar" style="height: 32px;"></div>
+            <div class="hero-bar" style="height: 48px;"></div>
+            <div class="hero-bar" style="height: 32px;"></div>
+            <div class="hero-bar" style="height: 72px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 48px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 48px;"></div>
+            <div class="hero-bar" style="height: 56px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 32px;"></div>
+            <div class="hero-bar" style="height: 24px;"></div>
+            <div class="hero-bar" style="height: 24px;"></div>
+            <div class="hero-bar" style="height: 64px;"></div>
+            <div class="hero-bar" style="height: 64px;"></div>
+            <div class="hero-bar" style="height: 16px;"></div>
+            <div class="hero-bar" style="height: 40px;"></div>
+            <div class="hero-bar" style="height: 16px;"></div>
+            <div class="hero-bar" style="height: 8px;"></div>
+            <div class="hero-bar" style="height: 8px;"></div>
+        </div>
+    </div>
+    
+    <!-- PV動画セクション（ヒーローの下に移動） -->
+    <div style="background-color: var(--bg-main); padding-top: 80px; padding-bottom: 80px;">
+        <div class="pv-container" style="margin: 0 auto; position: relative; z-index: 10;">
+            <p>PV動画 (YouTubeリンク等)</p>
+        </div>
+    </div>
+    <!-- 遊び方セクション -->
+    <section id="how-to-play" class="section">
+        <h2 class="section-title title-green">遊び方</h2>
+        <p class="section-subtitle">簡単３ステップ</p>
+
+        <!-- 1: 左 (テキスト → 画像) -->
+        <div class="row">
+            <div class="text-box">
+                <h3>1 <span>ブラウザから<br>好きな曲データと<br>譜面データをダウンロード</span></h3>
+            </div>
+            <div class="img-placeholder">画像 or GIF 1</div>
+        </div>
+
+        <!-- 2: 右 (テキスト → 画像) ... 右配置にするため、CSSで flex-direction を制御 -->
+        <div class="row" style="flex-direction: row-reverse; justify-content: flex-end;">
+            <div class="text-box" style="text-align: right;">
+                <h3><span>ゲーム内で<br>遊ぶ曲と難易度<br>を選択</span> 2</h3>
+            </div>
+            <div class="img-placeholder">画像 or GIF 2</div>
+        </div>
+
+        <!-- 3: 左 (テキスト → 画像) -->
+        <div class="row">
+            <div class="text-box">
+                <h3>3 <span>キーボードを叩いて<br>目指せハイスコア</span></h3>
+            </div>
+            <div class="img-placeholder">画像 or GIF 3</div>
+        </div>
+
+        <div class="row reverse" style="margin-top: 60px;">
+            <div class="text-box">
+                <h3 style="color: var(--secondary);"><span>カスタマイズも充実<br>マイスタイルで Let's Raythm!</span></h3>
+            </div>
+            <div class="img-placeholder">画像 or GIF 4</div>
+        </div>
+    </section>
+
+    <!-- モードセクション -->
+    <section id="mode" class="section">
+        <h2 class="section-title" style="border-color: var(--accent-lightgreen);">モード</h2>
+        <p class="section-subtitle">３種類の遊び方</p>
+
+        <div class="row">
+            <div class="img-placeholder">画像 or GIF 5</div>
+            <div class="text-box">
+                <h4>プレイモード</h4>
+                <p>1人で楽しむモード。<br>フレンドとハイスコアを競うことも可能。オフラインプレイも可。</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="img-placeholder">画像 or GIF 6</div>
+            <div class="text-box">
+                <h4>マルチプレイモード</h4>
+                <p>フレンドとリアルタイムで同じ譜面をプレイし、実力を競い合おう。</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="img-placeholder">画像 or GIF 7</div>
+            <div class="text-box">
+                <h4>作成モード</h4>
+                <p>楽曲の好きな箇所にノーツを配置し、オリジナルの譜面を作成・共有可能。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ランキングセクション -->
+    <section id="ranking" class="section">
+        <h2 class="section-title title-yellow">ランキング</h2>
+        <p class="section-subtitle">ライバルは世界だ</p>
+
+        <div class="row">
+            <div class="text-box">
+                <p>プレイモードのスコアとレートや、上位にいる曲の割合（レート）が数値へ変わる。<br>目指せ Season No.1！</p>
+                <p style="font-size: 12px; color: #888; margin-top: 10px;">※この機能を利用するにはSteamログインが必要です。</p>
+            </div>
+            <div class="img-placeholder">画像 or GIF 8</div>
+        </div>
+    </section>
+
+    <!-- 楽曲・公募セクション -->
+    <section id="songs" class="section">
+        <h2 class="section-title title-orange">楽曲・公募</h2>
+        <p class="section-subtitle">多彩な楽曲を収録</p>
+
+        <ul class="song-list">
+            <li class="song-item">
+                <div class="song-icon">♪</div>
+                <div class="song-info">
+                    <strong>ColorRay</strong><br>
+                    <span style="font-size: 12px; color: #aaa;">by Koke</span>
+                </div>
+                <div class="play-icon">▶</div>
+            </li>
+            <li class="song-item">
+                <div class="song-icon">♪</div>
+                <div class="song-info">
+                    <strong>果ては想い届いて</strong><br>
+                    <span style="font-size: 12px; color: #aaa;">by Koke</span>
+                </div>
+                <div class="play-icon">▶</div>
+            </li>
+            <li class="song-item">
+                <div class="song-icon">♪</div>
+                <div class="song-info">
+                    <strong>ChronoEmulator</strong><br>
+                    <span style="font-size: 12px; color: #aaa;">by ねぎまさや</span>
+                </div>
+                <div class="play-icon">▶</div>
+            </li>
+        </ul>
+        <p style="text-align: center; font-size: 14px;">また、定期的な楽曲公募を実施！</p>
+        <div class="btn-center">
+            <a href="#" class="action-btn">公募詳細はこちら</a>
+        </div>
+    </section>
+
+    <!-- Q&Aセクション -->
+    <section id="qa" class="section">
+        <h2 class="section-title title-purple">Q & A</h2>
+        <p class="section-subtitle" style="margin-bottom: 20px;">質問をクリックすると回答が開きます</p>
+        
+        <details class="qa-item">
+            <summary class="question">ゲームの動作環境を教えてください。</summary>
+            <div class="answer">Windows 10/11 が搭載されたPCで動作します。（推奨スペックはSteamストアページをご確認ください）</div>
+        </details>
+        
+        <details class="qa-item">
+            <summary class="question">オリジナルの譜面はどこで配布できますか？</summary>
+            <div class="answer">作成した譜面データはブラウザ上の専用サイト、または有志のコミュニティで共有可能です。</div>
+        </details>
+        
+        <details class="qa-item">
+            <summary class="question">コントローラーでのプレイは可能ですか？</summary>
+            <div class="answer">現在キーボード操作に最適化されていますが、今後のアップデートで対応を検討しています。</div>
+        </details>
+    </section>
+
+    <!-- 利用規約セクション（新規追加） -->
+    <section id="terms" class="section">
+        <h2 class="section-title title-white">利用規約</h2>
+        <p class="section-subtitle">ゲームをプレイする前にご確認ください</p>
+        <div style="background-color: var(--bg-sub); padding: 20px; border-radius: 8px; font-size: 14px; color: #ccc;">
+            <p>ここに利用規約の本文が入ります。</p>
+            <p>1. 本ゲームのプレイ動画やスクリーンショットの配信・公開は自由に許可されています。<br>
+               2. 作成モードで制作した譜面データの共有は、公序良俗に反しない範囲で行ってください。<br>
+               3. 楽曲データについては、各コンポーザーが権利を保有しています。</p>
+        </div>
+    </section>
+
+    <!-- トップへ戻るボタン -->
+    <a href="#top" class="top-btn">トップ<br>戻る</a>
+
+    <footer>
+        &copy; 2026 raythm project. All rights reserved.
+    </footer>
+
+</body>
+</html>
