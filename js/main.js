@@ -8,13 +8,21 @@ if (menuButton && navigation) {
   navBackdrop.tabIndex = -1;
   navBackdrop.setAttribute('aria-label', 'メニューを閉じる');
   document.body.append(navBackdrop);
+  document.body.append(navigation);
 
   const setNavigationOpen = (isOpen) => {
     navigation.classList.toggle('open', isOpen);
     navBackdrop.classList.toggle('open', isOpen);
     document.body.classList.toggle('nav-open', isOpen);
+    document.documentElement.classList.toggle('nav-open', isOpen);
     menuButton.setAttribute('aria-expanded', String(isOpen));
     menuButton.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+    if (!isOpen) {
+      navigation.querySelectorAll('.nav-section-toggle').forEach((button) => {
+        button.setAttribute('aria-expanded', 'false');
+        document.getElementById(button.getAttribute('aria-controls'))?.classList.remove('is-open');
+      });
+    }
   };
 
   menuButton.addEventListener('click', () => {
@@ -23,8 +31,25 @@ if (menuButton && navigation) {
 
   navBackdrop.addEventListener('click', () => setNavigationOpen(false));
 
-  navigation.addEventListener('click', () => {
-    setNavigationOpen(false);
+  navigation.addEventListener('click', (event) => {
+    if (event.target.closest('a')) setNavigationOpen(false);
+  });
+
+  navigation.querySelectorAll('.nav-section-toggle').forEach((button) => {
+    button.addEventListener('click', () => {
+      const submenu = document.getElementById(button.getAttribute('aria-controls'));
+      if (!submenu) return;
+      const willOpen = button.getAttribute('aria-expanded') !== 'true';
+
+      navigation.querySelectorAll('.nav-section-toggle').forEach((otherButton) => {
+        if (otherButton === button) return;
+        otherButton.setAttribute('aria-expanded', 'false');
+        document.getElementById(otherButton.getAttribute('aria-controls'))?.classList.remove('is-open');
+      });
+
+      button.setAttribute('aria-expanded', String(willOpen));
+      submenu.classList.toggle('is-open', willOpen);
+    });
   });
 
   document.addEventListener('keydown', (event) => {
@@ -57,14 +82,72 @@ document.querySelectorAll('.filter-button').forEach((button) => {
   });
 });
 
-const demoForm = document.querySelector('.form-demo');
-if (demoForm) {
+const entryConfirmDialog = document.querySelector('.entry-confirm-dialog');
+const entryConfirmForm = document.querySelector('[data-confirm-form]');
+const entryConfirmView = entryConfirmDialog?.querySelector('[data-confirm-view]');
+const entrySuccessView = entryConfirmDialog?.querySelector('[data-success-view]');
+let entryDialogScrollY = 0;
+
+const setEntrySummary = () => {
+  if (!entryConfirmDialog || !entryConfirmForm) return;
+  const values = {
+    title: entryConfirmForm.querySelector('#music-title')?.value || '',
+    artist: entryConfirmForm.querySelector('#music-artist')?.value || '',
+    email: entryConfirmForm.querySelector('#music-email')?.value || '',
+    account: entryConfirmForm.querySelector('#music-account')?.value || '',
+    file: entryConfirmForm.querySelector('#music-file')?.files?.[0]?.name || ''
+  };
+
+  Object.entries(values).forEach(([key, value]) => {
+    const output = entryConfirmDialog.querySelector(`[data-summary="${key}"]`);
+    if (output) output.textContent = value;
+  });
+};
+
+document.querySelectorAll('.form-demo').forEach((demoForm) => {
   demoForm.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (demoForm === entryConfirmForm && entryConfirmDialog) {
+      setEntrySummary();
+      entryConfirmView.hidden = false;
+      entrySuccessView.hidden = true;
+      entryConfirmDialog.setAttribute('aria-labelledby', 'entry-confirm-title');
+      entryDialogScrollY = window.scrollY;
+      document.documentElement.classList.add('dialog-open');
+      document.body.classList.add('dialog-open');
+      document.body.style.top = `-${entryDialogScrollY}px`;
+      entryConfirmDialog.showModal();
+      return;
+    }
     const note = demoForm.querySelector('.demo-note');
     if (note) note.textContent = 'デモのため送信は行われません。募集開始時にフォームを有効化します。';
   });
-}
+});
+
+entryConfirmDialog?.querySelector('[data-confirm-cancel]')?.addEventListener('click', () => {
+  entryConfirmDialog.close();
+});
+
+entryConfirmDialog?.querySelector('[data-confirm-submit]')?.addEventListener('click', () => {
+  entryConfirmView.hidden = true;
+  entrySuccessView.hidden = false;
+  entryConfirmDialog.setAttribute('aria-labelledby', 'entry-success-title');
+  entryConfirmForm?.reset();
+});
+
+entryConfirmDialog?.querySelector('[data-success-close]')?.addEventListener('click', () => {
+  entryConfirmDialog.close();
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+entryConfirmDialog?.addEventListener('close', () => {
+  document.documentElement.classList.remove('dialog-open');
+  document.body.classList.remove('dialog-open');
+  document.body.style.top = '';
+  window.scrollTo(0, entryDialogScrollY);
+});
 
 const topButton = document.querySelector('.top-button');
 if (topButton) {
