@@ -1,6 +1,37 @@
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.site-nav');
 
+if (navigation && !navigation.querySelector('a[href="news.html"]')) {
+  const homeLink = navigation.querySelector('a[href="index.html"]');
+  const newsLink = document.createElement('a');
+  newsLink.href = 'news.html';
+  newsLink.textContent = 'お知らせ';
+  if ((location.pathname.split('/').pop() || 'index.html') === 'news.html') newsLink.setAttribute('aria-current', 'page');
+  homeLink?.insertAdjacentElement('afterend', newsLink);
+}
+
+const musicCallsMenu = document.querySelector('#music-calls-menu');
+if (musicCallsMenu) {
+  const currentPage = location.pathname.split('/').pop() || 'index.html';
+  const musicCalls = [
+    { href: 'submission-1.html', label: '第1回楽曲公募' },
+    { href: 'submission.html', label: '第2回楽曲公募' }
+  ];
+  musicCallsMenu.replaceChildren(...musicCalls.map(({ href, label }) => {
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = label;
+    if (currentPage === href) link.setAttribute('aria-current', 'page');
+    return link;
+  }));
+}
+
+const musicCallNumber = document.body.dataset.musicCall;
+const entryTermsIntro = document.querySelector('.entry-terms-intro');
+if (musicCallNumber && entryTermsIntro) {
+  entryTermsIntro.textContent = `本規約は、raythmが実施する「raythm 第${musicCallNumber}回楽曲公募」への応募に適用されます。応募フォームを送信した時点で、本規約に同意したものとみなします。`;
+}
+
 if (menuButton && navigation) {
   const navBackdrop = document.createElement('button');
   navBackdrop.className = 'nav-backdrop';
@@ -71,22 +102,100 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
 
-document.querySelectorAll('.filter-button').forEach((button) => {
-  button.addEventListener('click', () => {
-    const filter = button.dataset.filter;
-    document.querySelectorAll('.filter-button').forEach((item) => item.classList.remove('active'));
-    button.classList.add('active');
-    document.querySelectorAll('.song-card').forEach((card) => {
-      card.hidden = filter !== 'all' && card.dataset.genre !== filter;
+const songSearch = document.querySelector('[data-song-search]');
+const songSearchEmpty = document.querySelector('.song-search-empty');
+if (songSearch) {
+  const songCards = [...document.querySelectorAll('.song-card')];
+  const normalizeSearchText = (value) => value.normalize('NFKC').toLocaleLowerCase('ja').trim();
+
+  songSearch.addEventListener('input', () => {
+    const query = normalizeSearchText(songSearch.value);
+    let visibleCount = 0;
+    songCards.forEach((card) => {
+      const matches = normalizeSearchText(card.textContent).includes(query);
+      card.hidden = !matches;
+      if (matches) visibleCount += 1;
     });
+    if (songSearchEmpty) songSearchEmpty.hidden = visibleCount !== 0;
   });
-});
+}
+
+const newsArchiveList = document.querySelector('[data-news-archive]');
+if (newsArchiveList) {
+  const newsItems = [...newsArchiveList.querySelectorAll('.news-item')];
+  const pageSize = 100;
+  const pageCount = Math.max(1, Math.ceil(newsItems.length / pageSize));
+  const requestedPage = Number.parseInt(new URLSearchParams(location.search).get('page') || '1', 10);
+  const currentPage = Math.min(pageCount, Math.max(1, Number.isFinite(requestedPage) ? requestedPage : 1));
+  const pageStart = (currentPage - 1) * pageSize;
+
+  newsItems.forEach((item, index) => {
+    item.hidden = index < pageStart || index >= pageStart + pageSize;
+  });
+
+  const pagination = document.querySelector('[data-news-pagination]');
+  if (pagination) {
+    const makeControl = (label, page, className, disabled) => {
+      const control = document.createElement(disabled ? 'span' : 'a');
+      control.className = className;
+      control.textContent = label;
+      if (disabled) control.setAttribute('aria-disabled', 'true');
+      else control.href = `news.html?page=${page}`;
+      return control;
+    };
+    pagination.replaceChildren(
+      makeControl('← 前のページ', currentPage - 1, 'news-prev', currentPage === 1),
+      Object.assign(document.createElement('span'), { className: 'news-page-status', textContent: `${currentPage} / ${pageCount}` }),
+      makeControl('次のページ →', currentPage + 1, 'news-next', currentPage === pageCount)
+    );
+  }
+}
 
 const entryConfirmDialog = document.querySelector('.entry-confirm-dialog');
 const entryConfirmForm = document.querySelector('[data-confirm-form]');
 const entryConfirmView = entryConfirmDialog?.querySelector('[data-confirm-view]');
 const entrySuccessView = entryConfirmDialog?.querySelector('[data-success-view]');
+const entryTermsDialog = document.querySelector('.entry-terms-dialog');
+const entryTermsOpen = document.querySelector('[data-entry-terms-open]');
 let entryDialogScrollY = 0;
+
+const lockEntryDialogScroll = () => {
+  entryDialogScrollY = window.scrollY;
+  document.documentElement.classList.add('dialog-open');
+  document.body.classList.add('dialog-open');
+  document.body.style.top = `-${entryDialogScrollY}px`;
+};
+
+const unlockEntryDialogScroll = () => {
+  document.documentElement.classList.remove('dialog-open');
+  document.body.classList.remove('dialog-open');
+  document.body.style.top = '';
+  window.scrollTo(0, entryDialogScrollY);
+};
+
+const accountList = entryConfirmForm?.querySelector('[data-account-list]');
+const accountAddButton = entryConfirmForm?.querySelector('[data-account-add]');
+
+const updateAccountAddButton = () => {
+  if (!accountList || !accountAddButton) return;
+  accountAddButton.disabled = accountList.querySelectorAll('.account-input').length >= 3;
+};
+
+accountAddButton?.addEventListener('click', () => {
+  if (!accountList || accountList.querySelectorAll('.account-input').length >= 3) return;
+  const row = document.createElement('div');
+  row.className = 'account-row';
+  row.innerHTML = '<input class="account-input" type="url" placeholder="SNSやWebサイトのURL"><button class="account-remove" type="button" aria-label="活動アカウントを削除">×</button>';
+  row.querySelector('.account-remove')?.addEventListener('click', () => {
+    row.remove();
+    updateAccountAddButton();
+  });
+  accountList.append(row);
+  row.querySelector('input')?.focus();
+  updateAccountAddButton();
+});
+
+updateAccountAddButton();
 
 const setEntrySummary = () => {
   if (!entryConfirmDialog || !entryConfirmForm) return;
@@ -94,8 +203,12 @@ const setEntrySummary = () => {
     title: entryConfirmForm.querySelector('#music-title')?.value || '',
     artist: entryConfirmForm.querySelector('#music-artist')?.value || '',
     email: entryConfirmForm.querySelector('#music-email')?.value || '',
-    account: entryConfirmForm.querySelector('#music-account')?.value || '',
-    file: entryConfirmForm.querySelector('#music-file')?.files?.[0]?.name || ''
+    account: [...entryConfirmForm.querySelectorAll('.account-input')].map((input) => input.value.trim()).filter(Boolean).join(' / ') || '未入力',
+    vocalSynth: entryConfirmForm.querySelector('#music-vocal-synth')?.value.trim() || '未入力',
+    mode: entryConfirmForm.querySelector('#music-community')?.checked ? 'Community楽曲として公開' : '非公開型（採用時のみOfficial楽曲として収録）',
+    file: entryConfirmForm.querySelector('#music-file')?.files?.[0]?.name || '',
+    midi: entryConfirmForm.querySelector('#music-midi')?.files?.[0]?.name || '',
+    jacket: entryConfirmForm.querySelector('#music-jacket')?.files?.[0]?.name || '未入力'
   };
 
   Object.entries(values).forEach(([key, value]) => {
@@ -112,10 +225,7 @@ document.querySelectorAll('.form-demo').forEach((demoForm) => {
       entryConfirmView.hidden = false;
       entrySuccessView.hidden = true;
       entryConfirmDialog.setAttribute('aria-labelledby', 'entry-confirm-title');
-      entryDialogScrollY = window.scrollY;
-      document.documentElement.classList.add('dialog-open');
-      document.body.classList.add('dialog-open');
-      document.body.style.top = `-${entryDialogScrollY}px`;
+      lockEntryDialogScroll();
       entryConfirmDialog.showModal();
       return;
     }
@@ -143,11 +253,22 @@ entryConfirmDialog?.querySelector('[data-success-close]')?.addEventListener('cli
 });
 
 entryConfirmDialog?.addEventListener('close', () => {
-  document.documentElement.classList.remove('dialog-open');
-  document.body.classList.remove('dialog-open');
-  document.body.style.top = '';
-  window.scrollTo(0, entryDialogScrollY);
+  unlockEntryDialogScroll();
 });
+
+entryTermsOpen?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  if (!entryTermsDialog) return;
+  lockEntryDialogScroll();
+  entryTermsDialog.showModal();
+});
+
+entryTermsDialog?.querySelectorAll('[data-entry-terms-close]').forEach((button) => {
+  button.addEventListener('click', () => entryTermsDialog.close());
+});
+
+entryTermsDialog?.addEventListener('close', unlockEntryDialogScroll);
 
 const topButton = document.querySelector('.top-button');
 if (topButton) {
