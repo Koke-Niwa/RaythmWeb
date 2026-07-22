@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="raythm のノーツの種類について">
+  <title>ノーツの種類 | 遊び方 | raythm</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icon_256.png">
+  <link rel="apple-touch-icon" href="assets/icon_256.png">
+  <link rel="stylesheet" href="css/style.css?v=20260721-bg3">
+  <script src="js/main.js?v=20260720-notes10" defer></script>
+</head>
+<body class="notes-page">
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html" aria-label="raythm ホーム"><img class="brand-icon" src="assets/icon_256.png" alt=""><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a><button class="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span></button><nav class="site-nav" aria-label="メインナビゲーション"><a href="index.html">ホーム</a><a href="songs.html">楽曲一覧</a><div class="nav-section"><button class="nav-section-toggle" type="button" aria-expanded="false" aria-controls="music-calls-menu"><span>楽曲募集</span><span class="nav-section-icon" aria-hidden="true"></span></button><div class="nav-submenu" id="music-calls-menu"><a href="submission-1.html">第1回楽曲公募</a><a href="submission.html">第2回楽曲公募</a></div></div><div class="nav-section"><button class="nav-section-toggle" type="button" aria-expanded="false" aria-controls="chart-calls-menu"><span>譜面募集</span><span class="nav-section-icon" aria-hidden="true"></span></button><div class="nav-submenu" id="chart-calls-menu"><a href="chart-submission.html">第1回譜面公募</a></div></div><a href="events.html">イベント情報</a><a href="how-to-play.html">遊び方</a></nav></div></header>
+  <main>
+    <section class="page-hero"><div class="wrap"><p class="title-en">NOTES</p><h1>ノーツの種類</h1><p>譜面に登場するノーツの見た目と操作方法を紹介します。ノーツデザインは画像上のボタンからNormalとRayで切り替えることができます。これらの処理に違いはありません。</p></div></section>
+
+    <section class="notes-guide" aria-label="ノーツ一覧">
+      <div class="notes-guide-list">
+        <article class="note-guide-item reveal" data-note-item>
+          <div class="note-visual-column">
+            <div class="note-variant-switch" role="group" aria-label="タップノーツの表示切り替え">
+              <button type="button" class="note-variant-button is-active" data-note-variant="normal" aria-pressed="true">Normal</button>
+              <button type="button" class="note-variant-button" data-note-variant="ray" aria-pressed="false">Ray</button>
+            </div>
+            <div class="note-lane-stage">
+              <div class="note-lanes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <img class="note-sprite" src="assets/notes/Tap.png" data-normal-src="assets/notes/Tap.png" data-ray-src="assets/notes/RayTap.png" data-alt-base="タップノーツ" alt="Normal タップノーツ">
+            </div>
+          </div>
+          <div class="note-guide-copy"><p class="note-guide-number">01</p><h3>タップノーツ</h3><p>このノーツが流れてきたとき、そのレーンに対応するキーをタイミングよく押しましょう。</p></div>
+        </article>
+
+        <article class="note-guide-item reveal" data-note-item>
+          <div class="note-visual-column">
+            <div class="note-variant-switch" role="group" aria-label="ワイドノーツの表示切り替え">
+              <button type="button" class="note-variant-button is-active" data-note-variant="normal" aria-pressed="true">Normal</button>
+              <button type="button" class="note-variant-button" data-note-variant="ray" aria-pressed="false">Ray</button>
+            </div>
+            <div class="note-lane-stage">
+              <div class="note-lanes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <img class="note-sprite note-sprite-wide" src="assets/notes/WideTap.png" data-normal-src="assets/notes/WideTap.png" data-ray-src="assets/notes/RayWideTap.png" data-alt-base="ワイドノーツ" alt="Normal ワイドノーツ">
+            </div>
+          </div>
+          <div class="note-guide-copy"><p class="note-guide-number">02</p><h3>ワイドノーツ</h3><p>このノーツが流れてきたとき、跨いでいるいずれかのレーンに対応するキーをタイミングよく押しましょう。</p></div>
+        </article>
+
+        <article class="note-guide-item reveal" data-note-item>
+          <div class="note-visual-column">
+            <div class="note-variant-switch" role="group" aria-label="ロングノーツの表示切り替え">
+              <button type="button" class="note-variant-button is-active" data-note-variant="normal" aria-pressed="true">Normal</button>
+              <button type="button" class="note-variant-button" data-note-variant="ray" aria-pressed="false">Ray</button>
+            </div>
+            <div class="note-lane-stage">
+              <div class="note-lanes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <img class="note-sprite note-sprite-long" src="assets/notes/Long.png" data-normal-src="assets/notes/Long.png" data-ray-src="assets/notes/RayLong.png" data-alt-base="ロングノーツ" alt="Normal ロングノーツ">
+            </div>
+          </div>
+          <div class="note-guide-copy"><p class="note-guide-number">03</p><h3>ロングノーツ</h3><p>このノーツが流れている間、そのレーンに対応するキーを押し続けましょう。ノーツの終点に判定はなく、離す必要はありません。</p></div>
+        </article>
+
+        <article class="note-guide-item reveal" data-note-item>
+          <div class="note-visual-column">
+            <div class="note-variant-switch" role="group" aria-label="ステイノーツの表示切り替え">
+              <button type="button" class="note-variant-button is-active" data-note-variant="normal" aria-pressed="true">Normal</button>
+              <button type="button" class="note-variant-button" data-note-variant="ray" aria-pressed="false">Ray</button>
+            </div>
+            <div class="note-lane-stage">
+              <div class="note-lanes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <img class="note-sprite note-sprite-small" src="assets/notes/Stay.png" data-normal-src="assets/notes/Stay.png" data-ray-src="assets/notes/RayStay.png" data-alt-base="ステイノーツ" alt="Normal ステイノーツ">
+            </div>
+          </div>
+          <div class="note-guide-copy"><p class="note-guide-number">04</p><h3>ステイノーツ</h3><p>このノーツが流れてきたとき、そのレーンに対応するキーを押している状態にしましょう。</p></div>
+        </article>
+
+        <article class="note-guide-item reveal" data-note-item>
+          <div class="note-visual-column">
+            <div class="note-variant-switch" role="group" aria-label="リリースノーツの表示切り替え">
+              <button type="button" class="note-variant-button is-active" data-note-variant="normal" aria-pressed="true">Normal</button>
+              <button type="button" class="note-variant-button" data-note-variant="ray" aria-pressed="false">Ray</button>
+            </div>
+            <div class="note-lane-stage">
+              <div class="note-lanes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <img class="note-sprite note-sprite-release" src="assets/notes/Release.png" data-normal-src="assets/notes/Release.png" data-ray-src="assets/notes/RayRelease.png" data-alt-base="リリースノーツ" alt="Normal リリースノーツ">
+            </div>
+          </div>
+          <div class="note-guide-copy"><p class="note-guide-number">05</p><h3>リリースノーツ</h3><p>このノーツが流れてきたとき、そのレーンに対応するキーを、タイミングよく離しましょう。ロングノーツの終点にある場合はそのまま離し、単独で存在する場合は一度押してから離しましょう。</p></div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><a class="brand" href="index.html"><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a></div></footer>
+</body>
+</html>

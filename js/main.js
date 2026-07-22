@@ -32,6 +32,39 @@ if (musicCallNumber && entryTermsIntro) {
   entryTermsIntro.textContent = `本規約は、raythmが実施する「raythm 第${musicCallNumber}回楽曲公募」への応募に適用されます。応募フォームを送信した時点で、本規約に同意したものとみなします。`;
 }
 
+if (navigation) {
+  const playGuideLink = navigation.querySelector('a[href="how-to-play.html"]');
+  if (playGuideLink) {
+    const currentPage = location.pathname.split('/').pop() || 'index.html';
+    const playGuides = [
+      { href: 'how-to-play.html', label: '基本' },
+      { href: 'multiplayer.html', label: 'マルチプレイ' },
+      { href: 'studio.html', label: 'スタジオ' },
+      { href: 'notes.html', label: 'ノーツの種類' }
+    ];
+    const playSection = document.createElement('div');
+    playSection.className = 'nav-section';
+    const playToggle = document.createElement('button');
+    playToggle.className = 'nav-section-toggle';
+    playToggle.type = 'button';
+    playToggle.setAttribute('aria-expanded', 'false');
+    playToggle.setAttribute('aria-controls', 'play-guides-menu');
+    playToggle.innerHTML = '<span>遊び方</span><span class="nav-section-icon" aria-hidden="true"></span>';
+    const playMenu = document.createElement('div');
+    playMenu.className = 'nav-submenu';
+    playMenu.id = 'play-guides-menu';
+    playMenu.replaceChildren(...playGuides.map(({ href, label }) => {
+      const link = document.createElement('a');
+      link.href = href;
+      link.textContent = label;
+      if (currentPage === href) link.setAttribute('aria-current', 'page');
+      return link;
+    }));
+    playSection.append(playToggle, playMenu);
+    playGuideLink.replaceWith(playSection);
+  }
+}
+
 if (menuButton && navigation) {
   const navBackdrop = document.createElement('button');
   navBackdrop.className = 'nav-backdrop';
@@ -101,6 +134,143 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 
 document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+
+const noteGuideItems = [...document.querySelectorAll('[data-note-item]')];
+if (noteGuideItems.length) {
+  noteGuideItems.forEach((item) => {
+    const sprite = item.querySelector('.note-sprite');
+    if (!sprite) return;
+
+    [sprite.dataset.normalSrc, sprite.dataset.raySrc].forEach((source) => {
+      if (!source) return;
+      const preload = new Image();
+      preload.src = source;
+    });
+
+    item.querySelectorAll('[data-note-variant]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const variant = button.dataset.noteVariant;
+        const nextSource = variant === 'ray' ? sprite.dataset.raySrc : sprite.dataset.normalSrc;
+        if (!nextSource) return;
+
+        sprite.src = nextSource;
+        sprite.alt = `${variant === 'ray' ? 'Ray' : 'Normal'} ${sprite.dataset.altBase}`;
+        item.classList.toggle('is-ray', variant === 'ray');
+        item.querySelectorAll('[data-note-variant]').forEach((variantButton) => {
+          const isActive = variantButton === button;
+          variantButton.classList.toggle('is-active', isActive);
+          variantButton.setAttribute('aria-pressed', String(isActive));
+        });
+      });
+    });
+  });
+
+  const reduceNoteMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let noteScrollFrame = 0;
+  const updateNoteScroll = () => {
+    noteScrollFrame = 0;
+    if (reduceNoteMotion.matches) return;
+    const viewportHeight = window.innerHeight;
+    noteGuideItems.forEach((item) => {
+      const stage = item.querySelector('.note-lane-stage');
+      const copy = item.querySelector('.note-guide-copy');
+      if (!stage || !copy) return;
+      const triggerElement = window.innerWidth <= 760 ? stage : copy;
+      const triggerRect = triggerElement.getBoundingClientRect();
+      const triggerCenter = triggerRect.top + triggerRect.height / 2;
+      const centerDelta = viewportHeight / 2 - triggerCenter;
+      const holdDistance = viewportHeight * .035;
+      const travelDistance = viewportHeight * .35;
+      let progress = .5;
+      if (centerDelta < -holdDistance) {
+        const phase = Math.min(1, Math.max(0, (centerDelta + travelDistance) / (travelDistance - holdDistance)));
+        const easedPhase = phase * phase * (3 - 2 * phase);
+        progress = easedPhase * .5;
+      } else if (centerDelta > holdDistance) {
+        const phase = Math.min(1, Math.max(0, (centerDelta - holdDistance) / (travelDistance - holdDistance)));
+        const easedPhase = phase * phase * (3 - 2 * phase);
+        progress = .5 + easedPhase * .5;
+      }
+      const travel = -190 + progress * 380;
+      const opacity = Math.min(1, progress * 7, (1 - progress) * 12);
+      stage.style.setProperty('--note-travel', `${travel.toFixed(1)}px`);
+      stage.style.setProperty('--note-opacity', opacity.toFixed(3));
+    });
+  };
+  const requestNoteScrollUpdate = () => {
+    if (noteScrollFrame) return;
+    noteScrollFrame = requestAnimationFrame(updateNoteScroll);
+  };
+  updateNoteScroll();
+  window.addEventListener('scroll', requestNoteScrollUpdate, { passive: true });
+  window.addEventListener('resize', requestNoteScrollUpdate, { passive: true });
+  reduceNoteMotion.addEventListener?.('change', requestNoteScrollUpdate);
+}
+
+const studioScreen = document.querySelector('[data-studio-screen]');
+const studioDetail = document.querySelector('[data-studio-detail]');
+if (studioScreen && studioDetail) {
+  const studioHotspots = [...studioScreen.querySelectorAll('.studio-hotspot')];
+  const studioDetailTitle = studioDetail.querySelector('[data-studio-detail-title]');
+  const studioDetailDescription = studioDetail.querySelector('[data-studio-detail-description]');
+  const defaultStudioDetailTitle = studioDetailTitle.textContent;
+  const defaultStudioDetailDescription = studioDetailDescription.textContent;
+  let pinnedStudioHotspot = null;
+
+  const showStudioDetail = (hotspot) => {
+    studioHotspots.forEach((button) => {
+      const isActive = button === hotspot;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-expanded', String(isActive));
+    });
+    studioDetailTitle.textContent = hotspot.dataset.studioTitle || '';
+    studioDetailDescription.textContent = hotspot.dataset.studioDescription || '';
+  };
+
+  const hideStudioDetail = () => {
+    studioHotspots.forEach((button) => {
+      button.classList.remove('is-active');
+      button.setAttribute('aria-expanded', 'false');
+    });
+    studioDetailTitle.textContent = defaultStudioDetailTitle;
+    studioDetailDescription.textContent = defaultStudioDetailDescription;
+  };
+
+  studioHotspots.forEach((hotspot) => {
+    hotspot.setAttribute('aria-expanded', 'false');
+    hotspot.addEventListener('pointerenter', () => {
+      if (!pinnedStudioHotspot) showStudioDetail(hotspot);
+    });
+    hotspot.addEventListener('pointerleave', () => {
+      if (!pinnedStudioHotspot) hideStudioDetail();
+    });
+    hotspot.addEventListener('focus', () => showStudioDetail(hotspot));
+    hotspot.addEventListener('blur', () => {
+      if (!pinnedStudioHotspot) hideStudioDetail();
+    });
+    hotspot.addEventListener('click', () => {
+      if (pinnedStudioHotspot === hotspot) {
+        pinnedStudioHotspot = null;
+        hideStudioDetail();
+        return;
+      }
+      pinnedStudioHotspot = hotspot;
+      showStudioDetail(hotspot);
+    });
+  });
+
+  studioScreen.addEventListener('click', (event) => {
+    if (event.target.closest('.studio-hotspot') || !pinnedStudioHotspot) return;
+    pinnedStudioHotspot = null;
+    hideStudioDetail();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !pinnedStudioHotspot) return;
+    pinnedStudioHotspot = null;
+    hideStudioDetail();
+  });
+}
 
 const songSearch = document.querySelector('[data-song-search]');
 const songSearchEmpty = document.querySelector('.song-search-empty');
@@ -199,12 +369,22 @@ updateAccountAddButton();
 
 const setEntrySummary = () => {
   if (!entryConfirmDialog || !entryConfirmForm) return;
-  const values = {
+  if (!entryConfirmDialog.querySelector('[data-summary="playerTitle"]')) {
+    const playerTitleRow = document.createElement('div');
+    playerTitleRow.innerHTML = '<dt>希望する称号名</dt><dd data-summary="playerTitle"></dd>';
+    entryConfirmDialog.querySelector('[data-summary="vocalSynth"]')?.closest('div')?.after(playerTitleRow);
+  }
+  const isChartEntry = Boolean(entryConfirmForm.querySelector('#chart-file'));
+  const values = isChartEntry ? {
+    creator: entryConfirmForm.querySelector('#chart-name')?.value.trim() || '',
+    chartFile: entryConfirmForm.querySelector('#chart-file')?.files?.[0]?.name || ''
+  } : {
     title: entryConfirmForm.querySelector('#music-title')?.value || '',
     artist: entryConfirmForm.querySelector('#music-artist')?.value || '',
     email: entryConfirmForm.querySelector('#music-email')?.value || '',
     account: [...entryConfirmForm.querySelectorAll('.account-input')].map((input) => input.value.trim()).filter(Boolean).join(' / ') || '未入力',
     vocalSynth: entryConfirmForm.querySelector('#music-vocal-synth')?.value.trim() || '未入力',
+    playerTitle: entryConfirmForm.querySelector('#music-player-title')?.value.trim() || '未入力',
     mode: entryConfirmForm.querySelector('#music-community')?.checked ? 'Community楽曲として公開' : '非公開型（採用時のみOfficial楽曲として収録）',
     file: entryConfirmForm.querySelector('#music-file')?.files?.[0]?.name || '',
     midi: entryConfirmForm.querySelector('#music-midi')?.files?.[0]?.name || '',
@@ -229,8 +409,6 @@ document.querySelectorAll('.form-demo').forEach((demoForm) => {
       entryConfirmDialog.showModal();
       return;
     }
-    const note = demoForm.querySelector('.demo-note');
-    if (note) note.textContent = 'デモのため送信は行われません。募集開始時にフォームを有効化します。';
   });
 });
 
@@ -328,6 +506,15 @@ if (homeHeader && homeHero) {
   steamLogo.setAttribute('aria-label', 'Steam');
   steamLogo.innerHTML = '<img src="assets/icons/steam-wordmark.svg" alt="">';
   header.insertBefore(steamLogo, menuButton || navigation);
+
+  const xLink = document.createElement('a');
+  xLink.className = 'header-x';
+  xLink.href = 'https://x.com/raythm_official';
+  xLink.target = '_blank';
+  xLink.rel = 'noopener noreferrer';
+  xLink.setAttribute('aria-label', 'raythm公式Xを開く');
+  xLink.innerHTML = '<span aria-hidden="true"></span>';
+  header.insertBefore(xLink, steamLogo);
 
   const volumeTrigger = control.querySelector('.volume-trigger');
   const volume = control.querySelector('.volume-slider');
