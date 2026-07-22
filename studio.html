@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="raythm のスタジオモードについて">
+  <title>スタジオ | 遊び方 | raythm</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icon_256.png">
+  <link rel="apple-touch-icon" href="assets/icon_256.png">
+  <link rel="stylesheet" href="css/style.css?v=20260721-bg3">
+  <script src="js/main.js?v=20260720-studio3" defer></script>
+</head>
+<body class="studio-page">
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html" aria-label="raythm ホーム"><img class="brand-icon" src="assets/icon_256.png" alt=""><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a><button class="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span></button><nav class="site-nav" aria-label="メインナビゲーション"><a href="index.html">ホーム</a><a href="songs.html">楽曲一覧</a><div class="nav-section"><button class="nav-section-toggle" type="button" aria-expanded="false" aria-controls="music-calls-menu"><span>楽曲募集</span><span class="nav-section-icon" aria-hidden="true"></span></button><div class="nav-submenu" id="music-calls-menu"><a href="submission-1.html">第1回楽曲公募</a><a href="submission.html">第2回楽曲公募</a></div></div><div class="nav-section"><button class="nav-section-toggle" type="button" aria-expanded="false" aria-controls="chart-calls-menu"><span>譜面募集</span><span class="nav-section-icon" aria-hidden="true"></span></button><div class="nav-submenu" id="chart-calls-menu"><a href="chart-submission.html">第1回譜面公募</a></div></div><a href="events.html">イベント情報</a><a href="how-to-play.html">遊び方</a></nav></div></header>
+  <main>
+    <section class="page-hero"><div class="wrap"><p class="title-en">STUDIO</p><h1>スタジオ</h1><p>Local楽曲と譜面の作成・編集・投稿を行うモードです。</p></div></section>
+
+    <section class="studio-guide" aria-labelledby="studio-actions-title">
+      <div class="studio-guide-heading reveal">
+        <h2 id="studio-actions-title">スタジオ画面でできること</h2>
+        <p>楽曲や譜面を選択し、目的に応じた操作をスタジオ画面から行えます。</p>
+      </div>
+
+      <div class="studio-screen reveal">
+        <div class="studio-screen-layout">
+          <div class="studio-screen-visual">
+            <div class="studio-screen-interactive" data-studio-screen>
+              <img src="assets/studio/studio.png" alt="raythmのスタジオ画面。新規曲、曲を編集、新規譜面、譜面を編集、譜面のインポート・エクスポート、譜面投稿の項目が表示されている">
+              <div class="studio-hotspots" aria-label="スタジオ画面の機能説明">
+                <button type="button" class="studio-hotspot hotspot-new-song" aria-label="新規曲の説明を表示" data-studio-title="新規曲" data-studio-description="Local楽曲としてraythmで遊べる楽曲を作成します。"></button>
+                <button type="button" class="studio-hotspot hotspot-edit-song" aria-label="曲を編集の説明を表示" data-studio-title="曲を編集" data-studio-description="楽曲の情報を編集します。自分で作成したLocal楽曲のみ編集できます。"></button>
+                <button type="button" class="studio-hotspot hotspot-new-chart" aria-label="新規譜面の説明を表示" data-studio-title="新規譜面" data-studio-description="選択中の楽曲のLocal譜面を作成します。"></button>
+                <button type="button" class="studio-hotspot hotspot-edit-chart" aria-label="譜面を編集の説明を表示" data-studio-title="譜面を編集" data-studio-description="選択中の譜面を編集します。Local譜面、もしくは自分で作成したCommunity譜面のみ編集できます。"></button>
+                <button type="button" class="studio-hotspot hotspot-import-chart" aria-label="譜面をインポートの説明を表示" data-studio-title="譜面をインポート" data-studio-description=".rchartファイルを選び、Local譜面として追加します。"></button>
+                <button type="button" class="studio-hotspot hotspot-export-chart" aria-label="譜面をエクスポートの説明を表示" data-studio-title="譜面をエクスポート" data-studio-description="選択中の譜面を.rchartファイルとして書き出します。Local譜面、もしくは自分で作成したCommunity譜面のみエクスポートできます。"></button>
+                <button type="button" class="studio-hotspot hotspot-submit-chart" aria-label="譜面投稿の説明を表示" data-studio-title="譜面投稿" data-studio-description="選択中の譜面をCommunity譜面として投稿します。Local譜面のみ投稿できます。"></button>
+              </div>
+            </div>
+            <p class="studio-screen-caption">ボタンにカーソルを合わせるか、タップすると説明が表示されます。</p>
+          </div>
+          <aside class="studio-screen-detail" data-studio-detail aria-live="polite">
+            <p class="studio-detail-label">SELECTED ACTION</p>
+            <h3 data-studio-detail-title>画面内のボタンを選択</h3>
+            <p data-studio-detail-description>左のスタジオ画面にあるボタンへカーソルを合わせるか、タップしてください。</p>
+            <div class="studio-future-action">
+              <span>実装予定</span>
+              <h4>譜面を複製</h4>
+              <p>選択中の譜面を複製し、Local譜面として新たに作成します。</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><a class="brand" href="index.html"><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a></div></footer>
+</body>
+</html>
