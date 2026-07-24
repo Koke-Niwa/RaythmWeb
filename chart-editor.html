@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="raythm の譜面制作エディターの使い方">
+  <title>譜面制作 | 遊び方 | raythm</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icon_256.png">
+  <link rel="apple-touch-icon" href="assets/icon_256.png">
+  <link rel="stylesheet" href="css/style.css?v=20260724-editor4">
+  <script src="js/main.js?v=20260724-editor1" defer></script>
+</head>
+<body class="chart-editor-page">
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html" aria-label="raythm ホーム"><img class="brand-icon" src="assets/icon_256.png" alt=""><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a><button class="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span></button><nav class="site-nav" aria-label="メインナビゲーション"><a href="index.html">ホーム</a><a href="songs.html">楽曲一覧</a><div class="nav-section"><button class="nav-section-toggle" type="button" aria-expanded="false" aria-controls="music-calls-menu"><span>楽曲募集</span><span class="nav-section-icon" aria-hidden="true"></span></button><div class="nav-submenu" id="music-calls-menu"><a href="submission-1.html">第1回楽曲公募</a><a href="submission.html">第2回楽曲公募</a></div></div><div class="nav-section"><button class="nav-section-toggle" type="button" aria-expanded="false" aria-controls="chart-calls-menu"><span>譜面募集</span><span class="nav-section-icon" aria-hidden="true"></span></button><div class="nav-submenu" id="chart-calls-menu"><a href="chart-submission.html">第1回譜面公募</a></div></div><a href="events.html">イベント情報</a><a href="how-to-play.html">遊び方</a></nav></div></header>
+  <main>
+    <section class="page-hero"><div class="wrap"><p class="title-en">CHART EDITOR</p><h1>譜面制作</h1><p>ノーツの配置から速度変化、テストプレイまで。エディターの基本操作を紹介します。</p></div></section>
+
+    <section class="editor-guide" data-editor-guide>
+      <div class="editor-screen reveal">
+        <div class="editor-screen-interactive">
+          <img src="assets/chart-editor/chart-editor.png" alt="raythmの譜面制作画面。左にノーツツールと全体ビュー、中央に譜面、右に速度変化レーン、上部に再生とテストプレイの操作が表示されている">
+          <div class="editor-hotspots" aria-label="譜面制作画面の機能説明">
+            <button type="button" class="editor-hotspot editor-hotspot-tools" data-editor-feature="tools" aria-label="ノーツツールの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-overview" data-editor-feature="overview" aria-label="全体ビューの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-chart" data-editor-feature="chart" aria-label="譜面入力エリアの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-ray" data-editor-feature="ray" aria-label="Rayノーツの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-rewind" data-editor-feature="rewind" aria-label="先頭へ戻る機能の説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-playback" data-editor-feature="playback" aria-label="エディター再生の説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-test" data-editor-feature="testplay" aria-label="テストプレイの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-snap" data-editor-feature="snap" aria-label="スナップの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-timing" data-editor-feature="timing" aria-label="タイミング設定の説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-meta" data-editor-feature="meta" aria-label="METAの説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-difficulty" data-editor-feature="difficulty" aria-label="自動難易度計算の説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-speed" data-editor-feature="speed" aria-label="速度変化の説明"></button>
+            <button type="button" class="editor-hotspot editor-hotspot-layer" data-editor-feature="layer" aria-label="MAINとDECOの説明"></button>
+          </div>
+        </div>
+        <p class="editor-screen-caption">画面のエリア、または下の項目を選ぶと詳しい説明が表示されます。</p>
+      </div>
+
+      <div class="editor-feature-layout reveal">
+        <div class="editor-feature-list" aria-label="譜面制作の機能一覧">
+          <button type="button" data-editor-feature-button="true" data-editor-feature="tools" data-editor-title="ノーツツール" data-editor-description="左側のTAPやLONGなどを押すと、配置するノーツを選択できます。選択後、譜面上の何もない場所を右クリックすると配置でき、配置済みのノーツを右クリックすると消去できます。">ノーツツール</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="chart" data-editor-title="譜面入力エリア" data-editor-description="譜面を打ち込み、ノーツを編集する中心的なエリアです。何もない場所を右クリックすると選択中のノーツを配置でき、配置済みのノーツを右クリックすると消去できます。ノーツを左クリックすると選択でき、ドラッグすると位置を変更できます。ロングノーツでは端を動かして長さも調整できます。ホイール操作で譜面内を移動でき、Shift＋左クリックで現在地のバーをその地点へ移動できます。">譜面入力エリア</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="ray" data-editor-title="Rayノーツ" data-editor-description="左側のRayを押すと、現在選択している種類のRayノーツを配置できる状態へ切り替わります。">Rayノーツ</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="rewind" data-editor-title="先頭へ戻る" data-editor-description="譜面入力エリアの現在値バーを、譜面の一番最初へ戻します。最初から内容を確認したいときに使用します。">先頭へ戻る</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="playback" data-editor-title="エディター再生" data-editor-description="Spaceキー、または再生ボタンで、エディター画面のまま譜面を再生できます。Shift＋左クリックで現在地を移動しておけば、その地点から確認できます。">エディター再生</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="testplay" data-editor-title="テストプレイ" data-editor-description="画面上部のテストプレイボタン、またはF5で現在地からテストプレイできます。Shift＋F5を使うと、曲の最初からテストプレイできます。">テストプレイ</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="snap" data-editor-title="スナップ" data-editor-description="ノーツを配置できる間隔の細かさを切り替えられます。作りたいリズムに合わせてスナップの分割数を選びます。">スナップ</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="timing" data-editor-title="タイミング設定" data-editor-description="BPMやテンポを設定できます。曲中に設定点を追加することで、BPMやテンポは何度でも変化させられます。">タイミング設定</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="meta" data-editor-title="META" data-editor-description="譜面のメタデータを編集できます。譜面名、作者、アンロック条件などを設定します。">META</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="difficulty" data-editor-title="自動難易度計算" data-editor-description="曲名「ColorArRay」の下にある「Lv.5.9」が譜面の難易度です。raythmでは譜面の内容から難易度が自動計算され、作成した譜面へ自動的に設定されます。この値を手動で変更することはできません。">自動難易度計算</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="overview" data-editor-title="全体ビュー" data-editor-description="譜面左の細いビューでは、譜面全体の構成をひと目で確認できます。ビュー内をクリックすると、該当する地点へすぐに移動できます。">全体ビュー</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="speed" data-editor-title="速度変化" data-editor-description="譜面右のレーンで速度変化を設定します。レーンを左クリックすると速度設定点を追加でき、上部の目盛りは数値を手動入力して変更できます。">速度変化</button>
+          <button type="button" data-editor-feature-button="true" data-editor-feature="layer" data-editor-title="MAIN / DECO" data-editor-description="MAINとDECOはタブで切り替えられます。raythmではDECOノーツだけがMAINとは別軸の速度設定を持つため、演出用の速度変化を独立して作れます。">MAIN / DECO</button>
+        </div>
+        <aside class="editor-feature-detail" aria-live="polite">
+          <p class="editor-detail-label">SELECTED FEATURE</p>
+          <h2 data-editor-detail-title>ノーツツール</h2>
+          <p data-editor-detail-description></p>
+        </aside>
+      </div>
+
+      <section class="editor-shortcuts reveal" aria-labelledby="editor-shortcuts-title">
+        <div class="editor-section-heading">
+          <p class="title-en">QUICK CONTROLS</p>
+          <h2 id="editor-shortcuts-title">よく使う操作</h2>
+        </div>
+        <div class="editor-shortcut-grid">
+          <div><kbd>右クリック</kbd><p>選択中のノーツを配置<br>配置済みノーツを消去</p></div>
+          <div><kbd>左クリック</kbd><p>ノーツを選択<br>速度設定点を追加</p></div>
+          <div><kbd>Shift</kbd><span>＋</span><kbd>左クリック</kbd><p>現在地のバーを移動</p></div>
+          <div><kbd>Space</kbd><p>エディター内で再生・停止</p></div>
+          <div><kbd>F5</kbd><p>現在地からテストプレイ</p></div>
+          <div><kbd>Shift</kbd><span>＋</span><kbd>F5</kbd><p>最初からテストプレイ</p></div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><a class="brand" href="index.html"><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a></div></footer>
+</body>
+</html>

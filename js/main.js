@@ -40,6 +40,7 @@ if (navigation) {
       { href: 'how-to-play.html', label: '基本' },
       { href: 'multiplayer.html', label: 'マルチプレイ' },
       { href: 'studio.html', label: 'スタジオ' },
+      { href: 'chart-editor.html', label: '譜面制作' },
       { href: 'notes.html', label: 'ノーツの種類' }
     ];
     const playSection = document.createElement('div');
@@ -270,6 +271,36 @@ if (studioScreen && studioDetail) {
     pinnedStudioHotspot = null;
     hideStudioDetail();
   });
+}
+
+const editorGuide = document.querySelector('[data-editor-guide]');
+if (editorGuide) {
+  const editorDetailTitle = editorGuide.querySelector('[data-editor-detail-title]');
+  const editorDetailDescription = editorGuide.querySelector('[data-editor-detail-description]');
+  const editorFeatureButtons = [...editorGuide.querySelectorAll('[data-editor-feature-button]')];
+  const editorFeatureTriggers = [...editorGuide.querySelectorAll('[data-editor-feature]')];
+  const editorFeatures = new Map(editorFeatureButtons.map((button) => [button.dataset.editorFeature, button]));
+
+  const showEditorFeature = (featureKey) => {
+    const feature = editorFeatures.get(featureKey);
+    if (!feature) return;
+
+    editorFeatureTriggers.forEach((trigger) => {
+      const isActive = trigger.dataset.editorFeature === featureKey;
+      trigger.classList.toggle('is-active', isActive);
+      if (trigger.matches('button')) trigger.setAttribute('aria-pressed', String(isActive));
+    });
+    editorDetailTitle.textContent = feature.dataset.editorTitle || '';
+    editorDetailDescription.textContent = feature.dataset.editorDescription || '';
+  };
+
+  editorFeatureTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => showEditorFeature(trigger.dataset.editorFeature));
+    trigger.addEventListener('pointerenter', () => showEditorFeature(trigger.dataset.editorFeature));
+    trigger.addEventListener('focus', () => showEditorFeature(trigger.dataset.editorFeature));
+  });
+
+  showEditorFeature(editorFeatureButtons[0]?.dataset.editorFeature);
 }
 
 const songSearch = document.querySelector('[data-song-search]');
