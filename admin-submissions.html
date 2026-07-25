@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>楽曲公募 管理 | raythm</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icon_256.png">
+  <link rel="stylesheet" href="css/style.css?v=20260725-links1">
+  <script src="js/admin-submissions.js?v=20260725-links1" defer></script>
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <header class="admin-header">
+      <div><p class="kicker">MUSIC SUBMISSIONS</p><h1>楽曲公募 管理</h1></div>
+      <p><a href="submission-1.html">応募ページを確認</a></p>
+    </header>
+
+    <section class="admin-login" data-admin-login>
+      <label>管理キー
+        <input type="password" autocomplete="current-password" data-admin-token placeholder="管理キーを入力">
+      </label>
+      <button type="button" data-admin-connect>応募一覧を開く</button>
+    </section>
+
+    <section data-admin-content hidden>
+      <div class="admin-toolbar">
+        <div>
+          <label for="admin-status-filter">確認状態の表示順</label>
+          <select id="admin-status-filter" data-admin-filter>
+            <option value="">未確認を先頭</option>
+            <option value="confirmed-first">確認済みを先頭</option>
+            <option value="unconfirmed-only">未確認のみ</option>
+            <option value="confirmed-only">確認済みのみ</option>
+          </select>
+        </div>
+        <button type="button" data-admin-refresh>更新</button>
+      </div>
+      <p class="admin-summary" data-admin-summary></p>
+      <p class="admin-message" data-admin-message role="alert"></p>
+      <div class="admin-grid" data-admin-list></div>
+    </section>
+  </main>
+</body>
+</html>

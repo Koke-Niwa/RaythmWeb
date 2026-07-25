@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "raythm",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2026-07-25",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "raythm-submissions",
+      "database_id": "8cccc94d-ac3f-464e-9744-41a9d5c48978",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 8766,
+    "local_protocol": "http"
+  }
+}

@@ -14,8 +14,7 @@ const musicCallsMenu = document.querySelector('#music-calls-menu');
 if (musicCallsMenu) {
   const currentPage = location.pathname.split('/').pop() || 'index.html';
   const musicCalls = [
-    { href: 'submission-1.html', label: '第1回楽曲公募' },
-    { href: 'submission.html', label: '第2回楽曲公募' }
+    { href: 'submission-1.html', label: '第1回楽曲公募' }
   ];
   musicCallsMenu.replaceChildren(...musicCalls.map(({ href, label }) => {
     const link = document.createElement('a');
@@ -417,10 +416,14 @@ const setEntrySummary = () => {
     vocalSynth: entryConfirmForm.querySelector('#music-vocal-synth')?.value.trim() || '未入力',
     playerTitle: entryConfirmForm.querySelector('#music-player-title')?.value.trim() || '未入力',
     mode: entryConfirmForm.querySelector('#music-community')?.checked ? 'Community楽曲として公開' : '非公開型（採用時のみOfficial楽曲として収録）',
-    file: entryConfirmForm.querySelector('#music-file')?.files?.[0]?.name || '',
-    midi: entryConfirmForm.querySelector('#music-midi')?.files?.[0]?.name || '',
-    jacket: entryConfirmForm.querySelector('#music-jacket')?.files?.[0]?.name || '未入力'
+    file: entryConfirmForm.querySelector('#music-url')?.value.trim() || '',
+    midi: entryConfirmForm.querySelector('#midi-url')?.value.trim() || '',
+    jacket: entryConfirmForm.querySelector('#jacket-url')?.value.trim() || '未入力'
   };
+
+  if (!isChartEntry) {
+    values.notes = entryConfirmForm.querySelector('#music-notes')?.value.trim() || '未入力';
+  }
 
   Object.entries(values).forEach(([key, value]) => {
     const output = entryConfirmDialog.querySelector(`[data-summary="${key}"]`);
@@ -531,12 +534,27 @@ if (homeHeader && homeHero) {
   `;
   header.insertBefore(control, menuButton || navigation);
 
-  const steamLogo = document.createElement('span');
+  const steamLogo = document.createElement('button');
   steamLogo.className = 'header-steam';
-  steamLogo.setAttribute('role', 'img');
-  steamLogo.setAttribute('aria-label', 'Steam');
-  steamLogo.innerHTML = '<img src="assets/icons/steam-wordmark.svg" alt="">';
+  steamLogo.type = 'button';
+  steamLogo.setAttribute('aria-label', 'Steam版の準備状況を表示');
+  steamLogo.setAttribute('aria-expanded', 'false');
+  steamLogo.innerHTML = '<img src="assets/icons/steam-wordmark.svg" alt=""><span class="steam-status-bubble" role="status">現在Steamページを準備中です。</span>';
   header.insertBefore(steamLogo, menuButton || navigation);
+
+  let steamBubbleTimer;
+  const closeSteamBubble = () => {
+    steamLogo.classList.remove('is-open');
+    steamLogo.setAttribute('aria-expanded', 'false');
+  };
+  steamLogo.addEventListener('click', () => {
+    const willOpen = !steamLogo.classList.contains('is-open');
+    clearTimeout(steamBubbleTimer);
+    steamLogo.classList.toggle('is-open', willOpen);
+    steamLogo.setAttribute('aria-expanded', String(willOpen));
+    if (willOpen) steamBubbleTimer = window.setTimeout(closeSteamBubble, 4000);
+  });
+  steamLogo.addEventListener('blur', closeSteamBubble);
 
   const xLink = document.createElement('a');
   xLink.className = 'header-x';

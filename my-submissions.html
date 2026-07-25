@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="この端末に保存されたraythm楽曲公募の応募内容を確認できます。">
+  <title>応募内容の確認 | raythm</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icon_256.png">
+  <link rel="apple-touch-icon" href="assets/icon_256.png">
+  <link rel="stylesheet" href="css/style.css?v=20260725-links1">
+  <script src="js/main.js?v=20260724-publish1" defer></script>
+  <script src="js/my-submissions.js?v=20260725-links1" defer></script>
+</head>
+<body class="submission-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <img class="brand-icon" src="assets/icon_256.png" alt="">
+        <img class="brand-logo" src="assets/raythm-title.svg" alt="raythm">
+      </a>
+      <button class="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span></button>
+      <nav class="site-nav" aria-label="メインナビゲーション">
+        <a href="index.html">ホーム</a>
+        <a href="songs.html">楽曲一覧</a>
+        <a href="submission-1.html">第1回楽曲公募</a>
+        <a href="how-to-play.html">詳しい遊び方</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="submission-main saved-submissions-main">
+    <div class="wrap saved-submissions-shell">
+      <header class="saved-submissions-header">
+        <p class="kicker">YOUR ENTRIES</p>
+        <h1>応募内容の確認</h1>
+        <p>このブラウザに保存された確認情報を使って、送信済みの応募内容を表示します。</p>
+      </header>
+
+      <div class="saved-submissions-notice">
+        <p>確認情報はこの端末のブラウザ内にだけ保存されます。ブラウザのデータを削除した場合や、別の端末では表示できません。</p>
+      </div>
+
+      <section class="saved-submissions-list" data-submission-list aria-live="polite">
+        <p class="saved-submissions-loading">応募情報を確認しています…</p>
+      </section>
+
+      <div class="saved-submissions-footer-actions">
+        <a class="button" href="submission-1.html">楽曲公募ページへ戻る</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="index.html"><img class="brand-logo" src="assets/raythm-title.svg" alt="raythm"></a>
+      <div class="footer-contact"><span>お問い合わせ</span><a href="mailto:raythm.game@gmail.com">raythm.game@gmail.com</a></div>
+    </div>
+  </footer>
+</body>
+</html>
